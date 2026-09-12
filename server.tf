@@ -8,7 +8,7 @@ data "aws_ami" "al2023" {
 }
 resource "aws_security_group" "web" {
   name   = "${var.project}-sg"
-  vpc_id = aws_vpc.main.id
+  vpc_id = module.network.vpc_id
   ingress {
     from_port   = 80
     to_port     = 80
@@ -25,8 +25,8 @@ resource "aws_security_group" "web" {
 }
 resource "aws_instance" "web" {
   ami                    = data.aws_ami.al2023.id
-  instance_type          = var.instance_type
-  subnet_id              = aws_subnet.public.id
+  instance_type          = local.instance_type
+  subnet_id              = module.network.subnet_ids["public-a"]
   vpc_security_group_ids = [aws_security_group.web.id]
   user_data              = <<-EOF
 #!/bin/bash
